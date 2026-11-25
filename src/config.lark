@@ -1,0 +1,17 @@
+start: (declaration | value)*
+declaration: /var(?![a-z])/ NAME value ";"
+?value: NUMBER -> number
+      | array
+      | expression
+array: "(" /list(?![a-z])/ value* ")"
+expression: "$" OP operand operand "$"
+?operand: value | INTEGER -> number | NAME -> reference
+
+OP: "+" | "-" | /pow(?![a-z])/
+NUMBER: /[0-9]+\.[0-9]*/
+INTEGER: /[0-9]+(?![0-9.])/
+NAME: /[a-z]+/
+%import common.WS
+%ignore WS
+%ignore /C[^\n]*/
+%ignore /\{-(?s:.*?)-\}/
