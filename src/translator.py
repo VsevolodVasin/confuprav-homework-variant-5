@@ -2,7 +2,7 @@
 
 import operator
 from decimal import Decimal, DecimalException
-from xml.etree import ElementTree as et
+from xml.etree import ElementTree
 
 from .parser import parse
 
@@ -22,6 +22,11 @@ def evaluate(node, constants):
         return constants[name]
     symbol, left, right = node.children
     args = [evaluate(item, constants) for item in (left, right)]
+    return calculate(symbol, args)
+
+
+def calculate(symbol, args):
+    """Применить числовую операцию к двум вычисленным значениям."""
     if not all(isinstance(arg, Decimal) for arg in args):
         raise ValueError(f"операция {symbol} требует два числа")
     try:
@@ -36,16 +41,16 @@ def evaluate(node, constants):
 def append_value(parent, value):
     """Добавить типизированный XML-элемент, сохраняя вложенность."""
     if isinstance(value, Decimal):
-        et.SubElement(parent, "number").text = str(value)
+        ElementTree.SubElement(parent, "number").text = str(value)
     else:
-        array = et.SubElement(parent, "list")
+        array = ElementTree.SubElement(parent, "list")
         for item in value:
             append_value(array, item)
 
 
 def translate(source):
     """Преобразовать программу в XML, разрешая имена по порядку."""
-    root = et.Element("config")
+    root = ElementTree.Element("config")
     constants = {}
     for node in parse(source).children:
         if node.data == "declaration":
@@ -53,9 +58,9 @@ def translate(source):
             if name in constants:
                 raise ValueError(f"повторное объявление {name}")
             constants[name] = evaluate(body, constants)
-            element = et.SubElement(root, "var", name=str(name))
+            element = ElementTree.SubElement(root, "var", name=str(name))
             append_value(element, constants[name])
         else:
             append_value(root, evaluate(node, constants))
-    et.indent(root)
-    return et.tostring(root, encoding="unicode")
+    ElementTree.indent(root)
+    return ElementTree.tostring(root, encoding="unicode")

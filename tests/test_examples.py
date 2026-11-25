@@ -4,7 +4,7 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
-from xml.etree import ElementTree as et
+from xml.etree import ElementTree
 
 
 class ExampleTests(unittest.TestCase):
@@ -18,7 +18,7 @@ class ExampleTests(unittest.TestCase):
                 [sys.executable, "-m", "src.cli"], input=source,
                 capture_output=True, text=True, check=True,
             )
-            root = et.fromstring(result.stdout)
+            root = ElementTree.fromstring(result.stdout)
             with self.subTest(domain=domain):
                 self.assertEqual(result.stderr, "")
                 self.assertEqual(

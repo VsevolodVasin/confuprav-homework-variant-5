@@ -3,7 +3,7 @@
 import subprocess
 import sys
 import unittest
-from xml.etree import ElementTree as et
+from xml.etree import ElementTree
 
 from src.translator import translate
 
@@ -11,7 +11,7 @@ from src.translator import translate
 class TranslatorTests(unittest.TestCase):
     def test_nested_operations(self):
         text = "var x 2.; var y (list (list $pow $+ x 1$ 2$) $- 1 3$);"
-        root = et.fromstring(translate(text))
+        root = ElementTree.fromstring(translate(text))
         values = [n.text for n in root.iter("number")]
         self.assertEqual(values, ["2", "9", "-2"])
         self.assertEqual(root[1].attrib, {"name": "y"})
@@ -22,7 +22,8 @@ class TranslatorTests(unittest.TestCase):
 
     def test_empty_list_and_comments(self):
         self.assertEqual(translate("C x\n(list {-x-})"), translate("(list)"))
-        self.assertIsNotNone(et.fromstring(translate("(list)")).find("list"))
+        root = ElementTree.fromstring(translate("(list)"))
+        self.assertIsNotNone(root.find("list"))
 
     def test_errors(self):
         for source in ("$+ x 1$", "var x 1.; var x 2.;", "$+ (list) 1$",
