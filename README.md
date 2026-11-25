@@ -52,3 +52,17 @@ echo 'var x 2.; $pow x 3$' | python -m src.cli
   <number>8</number>
 </config>
 ```
+
+## Три конфигурации
+
+| Входной файл | Предметная область | Проверяемое значение |
+|---|---|---|
+| audio.cfg | Звукозапись | Суммарная частота двух каналов 96000 |
+| orchard.cfg | Полив сада | Остаток запаса воды 12 литров |
+| graphics.cfg | Компьютерная графика | 65536 пикселей в текстуре |
+
+```sh
+python -m src.cli < examples/audio.cfg > audio.xml
+python -m src.cli < examples/orchard.cfg > orchard.xml
+python -m src.cli < examples/graphics.cfg > graphics.xml
+```
